@@ -1,0 +1,23 @@
+# https://rust-lang.github.io/rustfmt/?version=v1.4.36&search=
+brace_style = "SameLineWhere"
+control_brace_style = "AlwaysSameLine"
+fn_args_layout = "Tall"
+force_multiline_blocks = true
+wrap_comments = true
+comment_width = 120
+format_code_in_doc_comments = true
+hard_tabs = true
+tab_spaces = 4
+format_strings = true
+indent_style = "Block"
+match_block_trailing_comma = true
+max_width = 120
+newline_style = "Unix"
+normalize_comments = true
+normalize_doc_attributes = true
+reorder_impl_items = true
+reorder_imports = true
+group_imports = "StdExternalCrate"
+reorder_modules = true
+use_field_init_shorthand = false
+use_try_shorthand = true
