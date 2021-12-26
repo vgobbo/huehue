@@ -5,24 +5,11 @@ use std::time::Duration;
 use mdns_sd::{ServiceDaemon, ServiceEvent};
 use reqwest::{Certificate, Url};
 
-use crate::models;
+use crate::certificate::CERTIFICATE;
+use crate::{http, models};
 
 const SERVICE_NAME: &str = "_hue._tcp.local.";
 const VERSION_MIN: &str = "1948086000";
-const CERTIFICATE: &str = "-----BEGIN CERTIFICATE-----
-MIICMjCCAdigAwIBAgIUO7FSLbaxikuXAljzVaurLXWmFw4wCgYIKoZIzj0EAwIw
-OTELMAkGA1UEBhMCTkwxFDASBgNVBAoMC1BoaWxpcHMgSHVlMRQwEgYDVQQDDAty
-b290LWJyaWRnZTAiGA8yMDE3MDEwMTAwMDAwMFoYDzIwMzgwMTE5MDMxNDA3WjA5
-MQswCQYDVQQGEwJOTDEUMBIGA1UECgwLUGhpbGlwcyBIdWUxFDASBgNVBAMMC3Jv
-b3QtYnJpZGdlMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEjNw2tx2AplOf9x86
-aTdvEcL1FU65QDxziKvBpW9XXSIcibAeQiKxegpq8Exbr9v6LBnYbna2VcaK0G22
-jOKkTqOBuTCBtjAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBhjAdBgNV
-HQ4EFgQUZ2ONTFrDT6o8ItRnKfqWKnHFGmQwdAYDVR0jBG0wa4AUZ2ONTFrDT6o8
-ItRnKfqWKnHFGmShPaQ7MDkxCzAJBgNVBAYTAk5MMRQwEgYDVQQKDAtQaGlsaXBz
-IEh1ZTEUMBIGA1UEAwwLcm9vdC1icmlkZ2WCFDuxUi22sYpLlwJY81Wrqy11phcO
-MAoGCCqGSM49BAMCA0gAMEUCIEBYYEOsa07TH7E5MJnGw557lVkORgit2Rm1h3B2
-sFgDAiEA1Fj/C3AN5psFMjo0//mrQebo0eKd3aWRx+pQY08mk48=
------END CERTIFICATE-----";
 
 pub enum Error {
 	Connection,
@@ -109,11 +96,7 @@ impl Bridge {
 
 	async fn get_config(ip: &Ipv4Addr) -> Option<models::Config> {
 		let url = Url::parse(format!("https://{}/api/0/config", ip.to_string()).as_str()).unwrap();
-		let client = reqwest::Client::builder()
-			.add_root_certificate(Certificate::from_pem(CERTIFICATE.as_bytes()).unwrap())
-			.danger_accept_invalid_hostnames(true)
-			.build()
-			.unwrap();
+		let client = http::client();
 		client
 			.get(url.to_string())
 			.send()
