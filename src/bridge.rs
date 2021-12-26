@@ -3,28 +3,28 @@ use std::net::Ipv4Addr;
 use std::time::Duration;
 
 use mdns_sd::{ServiceDaemon, ServiceEvent};
-use reqwest::{Certificate, Url};
+use reqwest::Url;
 
-use crate::certificate::CERTIFICATE;
 use crate::{http, models};
 
 const SERVICE_NAME: &str = "_hue._tcp.local.";
 const VERSION_MIN: &str = "1948086000";
 
+#[derive(Debug, Hash, Eq, PartialEq)]
 pub enum Error {
 	Connection,
 	NotHue,
 	UnknownModel,
 }
 
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub enum Model {
 	BSB001,
 	BSB002,
 	Unknown,
 }
 
-#[derive(Debug, Hash, Eq, PartialEq)]
+#[derive(Debug, Clone, Hash, Eq, PartialEq)]
 pub struct Bridge {
 	pub id: String,
 	pub model: Model,
@@ -105,6 +105,10 @@ impl Bridge {
 			.json::<models::Config>()
 			.await
 			.ok()
+	}
+
+	pub fn url(&self, path: &str) -> url::Url {
+		Url::parse(format!("https://{}/{}", self.address.to_string(), path).as_str()).unwrap()
 	}
 }
 
