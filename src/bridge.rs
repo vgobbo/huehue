@@ -47,6 +47,13 @@ pub struct Bridge {
 }
 
 impl Bridge {
+	pub async fn new(ip: Ipv4Addr) -> Result<Bridge, Error> {
+		match Self::get_config(&ip).await {
+			Some(config) => Ok(Bridge::from((ip, config))),
+			None => Err(Error::Connection),
+		}
+	}
+
 	pub async fn discover(timeout: Duration) -> Vec<Bridge> {
 		let ips: HashSet<Ipv4Addr> = Self::discover_mdns(timeout)
 			.await
