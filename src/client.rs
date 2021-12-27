@@ -1,9 +1,11 @@
 use reqwest::Error;
 
+use crate::light::Lights;
 use crate::models::create_user::{CreateUserRequest, CreateUserResponse};
 use crate::models::device_type::DeviceType;
 use crate::models::error::ErrorCode;
-use crate::{http, Bridge};
+use crate::models::lights::GetLightsResponse;
+use crate::{http, Bridge, Light};
 
 #[derive(Debug)]
 pub enum AuthorizationError {
@@ -27,6 +29,14 @@ impl Client {
 			bridge,
 			device_type,
 			application_key: None,
+		}
+	}
+
+	pub fn new_with_key(bridge: Bridge, device_type: DeviceType, application_key: String) -> Client {
+		Client {
+			bridge,
+			device_type,
+			application_key: Some(application_key),
 		}
 	}
 
@@ -64,6 +74,35 @@ impl Client {
 			return Ok(());
 		}
 		if let Some(error) = &data.error {
+			return Err(AuthorizationError::Hue(error.r#type.clone()));
+		}
+
+		Err(AuthorizationError::Unknown)
+	}
+
+	pub async fn lights(&self) -> Result<Lights, AuthorizationError> {
+		if self.application_key.is_none() {
+			return Err(AuthorizationError::AlreadyAuthorized);
+		}
+
+		let response = match http::build_with_key(self.application_key.clone().unwrap())
+			.get(self.bridge.url("clip/v2/resource/light"))
+			.send()
+			.await
+		{
+			Ok(response) => response,
+			Err(e) => return Err(AuthorizationError::from(e)),
+		};
+
+		let payload = match response.json::<GetLightsResponse>().await {
+			Ok(payload) => payload,
+			Err(e) => return Err(AuthorizationError::from(e)),
+		};
+
+		if let Some(data) = payload.data {
+			return Ok(data.into_iter().map(|datum| Light::from(datum)).collect());
+		}
+		if let Some(error) = payload.error {
 			return Err(AuthorizationError::Hue(error.r#type.clone()));
 		}
 
