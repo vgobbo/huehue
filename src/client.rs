@@ -12,7 +12,7 @@ pub enum AuthorizationError {
 	Hue(ErrorCode),
 	AlreadyAuthorized,
 	Connection,
-	Response,
+	Response(reqwest::Error),
 	Unexpected,
 	Unknown,
 }
@@ -116,7 +116,7 @@ impl From<Error> for AuthorizationError {
 			return AuthorizationError::Connection;
 		}
 		if e.is_decode() {
-			return AuthorizationError::Response;
+			return AuthorizationError::Response(e);
 		}
 
 		AuthorizationError::Unknown
