@@ -30,6 +30,14 @@ impl Client {
 		}
 	}
 
+	pub fn device_type(&self) -> &DeviceType {
+		&self.device_type
+	}
+
+	pub fn client_key(&self) -> Option<String> {
+		self.client_key.clone()
+	}
+
 	pub async fn authorize(&mut self) -> Result<(), AuthorizationError> {
 		if self.client_key.is_some() {
 			return Err(AuthorizationError::AlreadyAuthorized);
