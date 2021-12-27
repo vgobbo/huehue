@@ -18,7 +18,7 @@ pub enum AuthorizationError {
 pub struct Client {
 	bridge: Bridge,
 	device_type: DeviceType,
-	client_key: Option<String>,
+	application_key: Option<String>,
 }
 
 impl Client {
@@ -26,7 +26,7 @@ impl Client {
 		Client {
 			bridge,
 			device_type,
-			client_key: None,
+			application_key: None,
 		}
 	}
 
@@ -34,12 +34,12 @@ impl Client {
 		&self.device_type
 	}
 
-	pub fn client_key(&self) -> Option<String> {
-		self.client_key.clone()
+	pub fn application_key(&self) -> Option<String> {
+		self.application_key.clone()
 	}
 
 	pub async fn authorize(&mut self) -> Result<(), AuthorizationError> {
-		if self.client_key.is_some() {
+		if self.application_key.is_some() {
 			return Err(AuthorizationError::AlreadyAuthorized);
 		}
 
@@ -60,7 +60,7 @@ impl Client {
 
 		let data = payload.get(0).unwrap();
 		if let Some(data) = &data.success {
-			self.client_key = Some(data.username.to_owned());
+			self.application_key = Some(data.username.to_owned());
 			return Ok(());
 		}
 		if let Some(error) = &data.error {

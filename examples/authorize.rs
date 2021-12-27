@@ -42,9 +42,9 @@ async fn main() {
 		}
 	} else {
 		let vars = format!(
-			"RUES_DEVICE_TYPE='{}'\nRUES_CLIENT_KEY='{}'\nRUES_BRIDGE='{}'\n",
+			"RUES_DEVICE_TYPE='{}'\nRUES_APPLICATION_KEY='{}'\nRUES_BRIDGE='{}'\n",
 			device_type.to_string(),
-			client.client_key().expect("Client key expected."),
+			client.application_key().expect("Application key expected."),
 			arguments.address
 		);
 
