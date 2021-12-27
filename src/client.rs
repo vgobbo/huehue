@@ -17,25 +17,25 @@ pub enum AuthorizationError {
 
 pub struct Client {
 	bridge: Bridge,
-	device_type: Option<DeviceType>,
+	device_type: DeviceType,
 	client_key: Option<String>,
 }
 
 impl Client {
-	pub fn new(bridge: Bridge) -> Client {
+	pub fn new(bridge: Bridge, device_type: DeviceType) -> Client {
 		Client {
 			bridge,
-			device_type: None,
+			device_type,
 			client_key: None,
 		}
 	}
 
-	pub async fn authorize(&mut self, device_type: DeviceType) -> Result<(), AuthorizationError> {
+	pub async fn authorize(&mut self) -> Result<(), AuthorizationError> {
 		if self.client_key.is_some() {
 			return Err(AuthorizationError::AlreadyAuthorized);
 		}
 
-		let request = CreateUserRequest::new(device_type.clone());
+		let request = CreateUserRequest::new(self.device_type.clone());
 
 		let response = match http::client().post(self.bridge.url("api")).json(&request).send().await {
 			Ok(response) => response,
@@ -52,7 +52,6 @@ impl Client {
 
 		let data = payload.get(0).unwrap();
 		if let Some(data) = &data.success {
-			self.device_type = Some(device_type);
 			self.client_key = Some(data.username.to_owned());
 			return Ok(());
 		}
@@ -72,8 +71,6 @@ impl From<Error> for AuthorizationError {
 		if e.is_decode() {
 			return AuthorizationError::Response;
 		}
-
-		println!("{:#?}", e);
 
 		AuthorizationError::Unknown
 	}
