@@ -45,7 +45,7 @@ impl Client {
 
 		let request = CreateUserRequest::new(self.device_type.clone());
 
-		let response = match http::client().post(self.bridge.url("api")).json(&request).send().await {
+		let response = match http::build().post(self.bridge.url("api")).json(&request).send().await {
 			Ok(response) => response,
 			Err(e) => return Err(AuthorizationError::from(e)),
 		};

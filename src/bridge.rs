@@ -96,7 +96,7 @@ impl Bridge {
 
 	async fn get_config(ip: &Ipv4Addr) -> Option<models::Config> {
 		let url = Url::parse(format!("https://{}/api/0/config", ip.to_string()).as_str()).unwrap();
-		let client = http::client();
+		let client = http::build();
 		client
 			.get(url.to_string())
 			.send()
