@@ -42,9 +42,10 @@ async fn main() {
 		}
 	} else {
 		let vars = format!(
-			"RUES_DEVICE_TYPE='{}'\nRUES_CLIENT_KEY='{}'\n",
+			"RUES_DEVICE_TYPE='{}'\nRUES_CLIENT_KEY='{}'\nRUES_BRIDGE='{}'\n",
 			device_type.to_string(),
-			client.client_key().expect("Client key expected.")
+			client.client_key().expect("Client key expected."),
+			arguments.address
 		);
 
 		match OpenOptions::new()
