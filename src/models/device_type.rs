@@ -1,11 +1,15 @@
+use std::str::FromStr;
+
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 const APPLICATION_NAME_REGEX: &str = r"^\w{1,20}$";
 const DEVICE_NAME_REGEX: &str = r"^\w{1,19}$";
+const DEVICE_TYPE_REGEX: &str = r"^(\w{1,20})#(\w{1,19})$";
 
 #[derive(Debug)]
 pub enum Error {
+	Invalid,
 	ApplicationName,
 	DeviceName,
 }
@@ -39,6 +43,23 @@ impl DeviceType {
 impl ToString for DeviceType {
 	fn to_string(&self) -> String {
 		format!("{}#{}", self.application_name, self.device_name)
+	}
+}
+
+impl FromStr for DeviceType {
+	type Err = Error;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		let re = Regex::new(DEVICE_TYPE_REGEX).unwrap();
+		match re.captures(s) {
+			Some(captures) => {
+				DeviceType::new(
+					captures.get(1).unwrap().as_str().to_owned(),
+					captures.get(2).unwrap().as_str().to_owned(),
+				)
+			},
+			None => Err(Error::Invalid),
+		}
 	}
 }
 
