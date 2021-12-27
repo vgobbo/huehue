@@ -1,6 +1,7 @@
 pub mod bridge;
 mod certificate;
 pub mod client;
+pub mod color;
 mod http;
 pub mod light;
 pub mod models;
