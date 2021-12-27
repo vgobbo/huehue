@@ -1,3 +1,4 @@
+use crate::color::{Color, Temperature};
 use crate::models::lights::GetLightsResponseItem;
 
 pub type Lights = Vec<Light>;
@@ -8,6 +9,8 @@ pub struct Light {
 	pub name: String,
 	pub on: bool,
 	pub brightness: f32,
+	pub color: Option<Color>,
+	pub temperature: Temperature,
 }
 
 impl Light {}
@@ -19,6 +22,8 @@ impl From<GetLightsResponseItem> for Light {
 			name: value.metadata.name,
 			on: value.on.on,
 			brightness: value.dimming.brightness,
+			color: value.color,
+			temperature: value.color_temperature,
 		}
 	}
 }

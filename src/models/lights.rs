@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use crate::color::{Color, Temperature};
 use crate::models::device_type::DeviceType;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -34,4 +35,7 @@ pub struct GetLightsResponseItem {
 	pub metadata: Metadata,
 	pub dimming: Dimming,
 	pub on: On,
+
+	pub color: Option<Color>,
+	pub color_temperature: Temperature,
 }
