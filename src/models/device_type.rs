@@ -15,7 +15,7 @@ pub enum Error {
 }
 
 /// Represents the weirdly named `devicetype`, used as identification during authentication.
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeviceType {
 	pub application_name: String,
 	pub device_name: String,
