@@ -17,6 +17,7 @@ pub enum AuthorizationError {
 	Unknown,
 }
 
+#[derive(Debug, Clone)]
 pub struct Client {
 	bridge: Bridge,
 	device_type: DeviceType,
@@ -100,7 +101,7 @@ impl Client {
 		};
 
 		if let Some(data) = payload.data {
-			return Ok(data.into_iter().map(|datum| Light::from(datum)).collect());
+			return Ok(data.into_iter().map(|datum| Light::new(self, datum)).collect());
 		}
 		if let Some(error) = payload.error {
 			return Err(AuthorizationError::Hue(error.r#type.clone()));

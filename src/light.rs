@@ -1,10 +1,12 @@
 use crate::color::{Color, Temperature};
 use crate::models::lights::GetLightsResponseItem;
+use crate::Client;
 
 pub type Lights = Vec<Light>;
 
 #[derive(Debug, Clone)]
 pub struct Light {
+	pub client: Client,
 	pub id: uuid::Uuid,
 	pub name: String,
 	pub on: bool,
@@ -13,17 +15,16 @@ pub struct Light {
 	pub temperature: Temperature,
 }
 
-impl Light {}
-
-impl From<GetLightsResponseItem> for Light {
-	fn from(value: GetLightsResponseItem) -> Self {
+impl Light {
+	pub fn new(client: &Client, light: GetLightsResponseItem) -> Light {
 		Light {
-			id: value.id,
-			name: value.metadata.name,
-			on: value.on.on,
-			brightness: value.dimming.brightness,
-			color: value.color,
-			temperature: value.color_temperature,
+			client: client.clone(),
+			id: light.id,
+			name: light.metadata.name,
+			on: light.on.on,
+			brightness: light.dimming.brightness,
+			color: light.color,
+			temperature: light.color_temperature,
 		}
 	}
 }
