@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use crate::color::{Color, Temperature};
-use crate::models::device_type::DeviceType;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Metadata {
