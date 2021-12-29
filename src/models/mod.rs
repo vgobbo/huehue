@@ -4,7 +4,6 @@ pub mod device_type;
 pub mod error;
 pub mod generic;
 pub mod lights;
-pub mod meethue;
 
 pub use config::Config;
 pub use error::Error;

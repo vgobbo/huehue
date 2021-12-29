@@ -3,8 +3,8 @@ use std::io::{BufWriter, Write};
 use std::net::Ipv4Addr;
 
 use rues::models::device_type::DeviceType;
+use rues::Client;
 use rues::HueError;
-use rues::{Bridge, Client};
 use serde::Serialize;
 use structopt::StructOpt;
 
@@ -25,11 +25,9 @@ async fn main() {
 
 	println!("Attempting to authorize with {}.", arguments.address);
 
-	let bridge = Bridge::new(arguments.address)
+	let mut client = Client::new(arguments.address, device_type.clone())
 		.await
 		.expect("Failed to read bridge information.");
-
-	let mut client = Client::new(bridge, device_type.clone());
 
 	if let Err(e) = client.authorize().await {
 		match e {

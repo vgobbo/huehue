@@ -31,10 +31,7 @@ impl Light {
 	}
 
 	pub async fn switch(&mut self, on: bool) -> Result<(), HueError> {
-		let url = self
-			.client
-			.bridge()
-			.url(format!("clip/v2/resource/light/{}", self.id).as_str());
+		let url = self.client.url(format!("clip/v2/resource/light/{}", self.id).as_str());
 		let application_key = self.client.application_key().clone().unwrap();
 		let request_payload = LightOnRequest::new(on);
 

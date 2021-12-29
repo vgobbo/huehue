@@ -1,9 +1,14 @@
+use std::net::Ipv4Addr;
+use std::time::Duration;
+
+use url::Url;
+
 use crate::http::HueError;
 use crate::light::Lights;
 use crate::models::create_user::{CreateUserRequest, CreateUserResponse};
 use crate::models::device_type::DeviceType;
 use crate::models::lights::GetLightsResponse;
-use crate::{http, Bridge, Light};
+use crate::{discover, http, models, Bridge, Light};
 
 #[derive(Debug, Clone)]
 pub struct Client {
@@ -13,24 +18,42 @@ pub struct Client {
 }
 
 impl Client {
-	pub fn new(bridge: Bridge, device_type: DeviceType) -> Client {
-		Client {
+	pub async fn new(ip: Ipv4Addr, device_type: DeviceType) -> Result<Client, HueError> {
+		let bridge = match Self::get_config(&ip).await {
+			Some(config) => Bridge::from((ip, config)),
+			None => return Err(HueError::Connection),
+		};
+
+		Ok(Client {
 			bridge,
 			device_type,
 			application_key: None,
-		}
+		})
 	}
 
-	pub fn new_with_key(bridge: Bridge, device_type: DeviceType, application_key: String) -> Client {
-		Client {
+	pub async fn new_with_key(
+		ip: Ipv4Addr,
+		device_type: DeviceType,
+		application_key: String,
+	) -> Result<Client, HueError> {
+		let bridge = match Self::get_config(&ip).await {
+			Some(config) => Bridge::from((ip, config)),
+			None => return Err(HueError::Connection),
+		};
+
+		Ok(Client {
 			bridge,
 			device_type,
 			application_key: Some(application_key),
-		}
+		})
 	}
 
 	pub fn bridge(&self) -> &Bridge {
 		&self.bridge
+	}
+
+	pub fn url(&self, path: &str) -> url::Url {
+		Url::parse(format!("https://{}/{}", self.bridge.address.to_string(), path).as_str()).unwrap()
 	}
 
 	pub fn device_type(&self) -> &DeviceType {
@@ -41,12 +64,38 @@ impl Client {
 		self.application_key.clone()
 	}
 
+	pub async fn bridges(timeout: Duration) -> Vec<Bridge> {
+		let ips = discover::discover(timeout).await;
+		let mut bridges = Vec::new();
+		for ip in ips {
+			match Self::get_config(&ip).await {
+				Some(config) => bridges.push(Bridge::from((ip, config))),
+				None => (),
+			}
+		}
+
+		bridges
+	}
+
 	fn check_authorization(&self) -> Result<(), HueError> {
 		if self.application_key.is_some() {
 			Ok(())
 		} else {
 			Err(HueError::AlreadyAuthorized)
 		}
+	}
+
+	async fn get_config(ip: &Ipv4Addr) -> Option<models::Config> {
+		let url = Url::parse(format!("https://{}/api/0/config", ip.to_string()).as_str()).unwrap();
+		let client = http::build();
+		client
+			.get(url.to_string())
+			.send()
+			.await
+			.ok()?
+			.json::<models::Config>()
+			.await
+			.ok()
 	}
 
 	pub async fn authorize(&mut self) -> Result<(), HueError> {
@@ -56,7 +105,7 @@ impl Client {
 
 		let request = CreateUserRequest::new(self.device_type.clone());
 
-		let response = match http::build().post(self.bridge.url("api")).json(&request).send().await {
+		let response = match http::build().post(self.url("api")).json(&request).send().await {
 			Ok(response) => response,
 			Err(e) => return Err(HueError::from(e)),
 		};
@@ -85,7 +134,7 @@ impl Client {
 		self.check_authorization()?;
 
 		let response = match http::build_with_key(self.application_key.clone().unwrap())
-			.get(self.bridge.url("clip/v2/resource/light"))
+			.get(self.url("clip/v2/resource/light"))
 			.send()
 			.await
 		{

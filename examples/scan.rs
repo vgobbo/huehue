@@ -1,11 +1,11 @@
 use std::time::Duration;
 
-use rues::Bridge;
+use rues::Client;
 
 #[tokio::main]
 async fn main() {
 	println!("Scanning for bridges for 5 seconds.");
-	let bridges = Bridge::discover(Duration::from_secs(5)).await;
+	let bridges = Client::bridges(Duration::from_secs(5)).await;
 	println!("{} bridges found.\n", bridges.len());
 
 	let mut i = 1;
