@@ -38,3 +38,14 @@ pub struct GetLightsResponseItem {
 	pub color: Option<Color>,
 	pub color_temperature: Temperature,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LightOnRequest {
+	pub on: On,
+}
+
+impl LightOnRequest {
+	pub fn new(on: bool) -> LightOnRequest {
+		LightOnRequest { on: On { on } }
+	}
+}
