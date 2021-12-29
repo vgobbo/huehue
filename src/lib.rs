@@ -8,4 +8,5 @@ pub mod models;
 
 pub use bridge::Bridge;
 pub use client::Client;
+pub use http::HueError;
 pub use light::Light;

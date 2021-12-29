@@ -1,21 +1,9 @@
-use reqwest::Error;
-
+use crate::http::HueError;
 use crate::light::Lights;
 use crate::models::create_user::{CreateUserRequest, CreateUserResponse};
 use crate::models::device_type::DeviceType;
-use crate::models::error::ErrorCode;
 use crate::models::lights::GetLightsResponse;
 use crate::{http, Bridge, Light};
-
-#[derive(Debug)]
-pub enum AuthorizationError {
-	Hue(ErrorCode),
-	AlreadyAuthorized,
-	Connection,
-	Response(reqwest::Error),
-	Unexpected,
-	Unknown,
-}
 
 #[derive(Debug, Clone)]
 pub struct Client {
@@ -41,6 +29,10 @@ impl Client {
 		}
 	}
 
+	pub fn bridge(&self) -> &Bridge {
+		&self.bridge
+	}
+
 	pub fn device_type(&self) -> &DeviceType {
 		&self.device_type
 	}
@@ -49,24 +41,32 @@ impl Client {
 		self.application_key.clone()
 	}
 
-	pub async fn authorize(&mut self) -> Result<(), AuthorizationError> {
+	fn check_authorization(&self) -> Result<(), HueError> {
 		if self.application_key.is_some() {
-			return Err(AuthorizationError::AlreadyAuthorized);
+			Ok(())
+		} else {
+			Err(HueError::AlreadyAuthorized)
+		}
+	}
+
+	pub async fn authorize(&mut self) -> Result<(), HueError> {
+		if self.application_key.is_some() {
+			return Err(HueError::AlreadyAuthorized);
 		}
 
 		let request = CreateUserRequest::new(self.device_type.clone());
 
 		let response = match http::build().post(self.bridge.url("api")).json(&request).send().await {
 			Ok(response) => response,
-			Err(e) => return Err(AuthorizationError::from(e)),
+			Err(e) => return Err(HueError::from(e)),
 		};
 
 		let payload = match response.json::<CreateUserResponse>().await {
 			Ok(data) => data,
-			Err(e) => return Err(AuthorizationError::from(e)),
+			Err(e) => return Err(HueError::from(e)),
 		};
 		if payload.len() != 1 {
-			return Err(AuthorizationError::Unexpected);
+			return Err(HueError::Unexpected);
 		}
 
 		let data = payload.get(0).unwrap();
@@ -75,16 +75,14 @@ impl Client {
 			return Ok(());
 		}
 		if let Some(error) = &data.error {
-			return Err(AuthorizationError::Hue(error.r#type.clone()));
+			return Err(HueError::from(error.r#type.clone()));
 		}
 
-		Err(AuthorizationError::Unknown)
+		Err(HueError::Unknown)
 	}
 
-	pub async fn lights(&self) -> Result<Lights, AuthorizationError> {
-		if self.application_key.is_none() {
-			return Err(AuthorizationError::AlreadyAuthorized);
-		}
+	pub async fn lights(&self) -> Result<Lights, HueError> {
+		self.check_authorization()?;
 
 		let response = match http::build_with_key(self.application_key.clone().unwrap())
 			.get(self.bridge.url("clip/v2/resource/light"))
@@ -92,34 +90,21 @@ impl Client {
 			.await
 		{
 			Ok(response) => response,
-			Err(e) => return Err(AuthorizationError::from(e)),
+			Err(e) => return Err(HueError::from(e)),
 		};
 
 		let payload = match response.json::<GetLightsResponse>().await {
 			Ok(payload) => payload,
-			Err(e) => return Err(AuthorizationError::from(e)),
+			Err(e) => return Err(HueError::from(e)),
 		};
 
 		if let Some(data) = payload.data {
 			return Ok(data.into_iter().map(|datum| Light::new(self, datum)).collect());
 		}
 		if let Some(error) = payload.error {
-			return Err(AuthorizationError::Hue(error.r#type.clone()));
+			return Err(HueError::from(error.r#type.clone()));
 		}
 
-		Err(AuthorizationError::Unknown)
-	}
-}
-
-impl From<Error> for AuthorizationError {
-	fn from(e: Error) -> Self {
-		if e.is_connect() {
-			return AuthorizationError::Connection;
-		}
-		if e.is_decode() {
-			return AuthorizationError::Response(e);
-		}
-
-		AuthorizationError::Unknown
+		Err(HueError::Unknown)
 	}
 }

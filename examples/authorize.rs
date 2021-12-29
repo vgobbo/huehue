@@ -2,9 +2,8 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 use std::net::Ipv4Addr;
 
-use rues::client::AuthorizationError;
 use rues::models::device_type::DeviceType;
-use rues::models::error::ErrorCode;
+use rues::HueError;
 use rues::{Bridge, Client};
 use serde::Serialize;
 use structopt::StructOpt;
@@ -34,10 +33,9 @@ async fn main() {
 
 	if let Err(e) = client.authorize().await {
 		match e {
-			AuthorizationError::Hue(ErrorCode::LinkButtonNotPressed) => {
+			HueError::Unauthorized => {
 				println!("Link button not pressed. Press the button and re-run this.")
 			},
-			AuthorizationError::Hue(e) => println!("Unexpected Hue error {:?}.", e),
 			e => println!("Unexpected error {:?}.", e),
 		}
 	} else {
