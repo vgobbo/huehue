@@ -3,7 +3,7 @@ use std::io::{BufWriter, Write};
 use std::net::Ipv4Addr;
 
 use rues::models::device_type::DeviceType;
-use rues::Client;
+use rues::Hue;
 use rues::HueError;
 use serde::Serialize;
 use structopt::StructOpt;
@@ -25,11 +25,11 @@ async fn main() {
 
 	println!("Attempting to authorize with {}.", arguments.address);
 
-	let mut client = Client::new(arguments.address, device_type.clone())
+	let mut hue = Hue::new(arguments.address, device_type.clone())
 		.await
 		.expect("Failed to read bridge information.");
 
-	if let Err(e) = client.authorize().await {
+	if let Err(e) = hue.authorize().await {
 		match e {
 			HueError::Unauthorized => {
 				println!("Link button not pressed. Press the button and re-run this.")
@@ -40,7 +40,7 @@ async fn main() {
 		let vars = format!(
 			"RUES_DEVICE_TYPE='{}'\nRUES_APPLICATION_KEY='{}'\nRUES_BRIDGE='{}'\n",
 			device_type.to_string(),
-			client.application_key().expect("Application key expected."),
+			hue.application_key().expect("Application key expected."),
 			arguments.address
 		);
 

@@ -2,7 +2,7 @@ use std::net::Ipv4Addr;
 use std::str::FromStr;
 
 use rues::models::device_type::DeviceType;
-use rues::{Client, Light};
+use rues::{Hue, Light};
 use serde::Serialize;
 use structopt::StructOpt;
 
@@ -42,11 +42,11 @@ async fn main() {
 	let arguments = Arguments::from_args();
 
 	let device_type = DeviceType::from_str(arguments.device_type.as_str()).expect("Invalid device name.");
-	let client = Client::new_with_key(arguments.bridge, device_type, arguments.application_key)
+	let hue = Hue::new_with_key(arguments.bridge, device_type, arguments.application_key)
 		.await
 		.expect("Failed to read bridge information.");
 
-	match client.lights().await {
+	match hue.lights().await {
 		Ok(lights) => lights.iter().for_each(|light| print_lights(light)),
 		Err(e) => println!("Unexpected Hue error {:?}.", e),
 	}

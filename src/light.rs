@@ -2,13 +2,13 @@ use crate::color::{Color, Temperature};
 use crate::http::HueError;
 use crate::models::lights::{GetLightsResponseItem, LightOnRequest};
 use crate::models::GenericResponse;
-use crate::{http, Client};
+use crate::{http, Hue};
 
 pub type Lights = Vec<Light>;
 
 #[derive(Debug, Clone)]
 pub struct Light {
-	pub client: Client,
+	pub client: Hue,
 	pub id: uuid::Uuid,
 	pub name: String,
 	pub on: bool,
@@ -18,7 +18,7 @@ pub struct Light {
 }
 
 impl Light {
-	pub fn new(client: &Client, light: GetLightsResponseItem) -> Light {
+	pub fn new(client: &Hue, light: GetLightsResponseItem) -> Light {
 		Light {
 			client: client.clone(),
 			id: light.id,

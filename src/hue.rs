@@ -11,37 +11,33 @@ use crate::models::lights::GetLightsResponse;
 use crate::{discover, http, models, Bridge, Light};
 
 #[derive(Debug, Clone)]
-pub struct Client {
+pub struct Hue {
 	bridge: Bridge,
 	device_type: DeviceType,
 	application_key: Option<String>,
 }
 
-impl Client {
-	pub async fn new(ip: Ipv4Addr, device_type: DeviceType) -> Result<Client, HueError> {
+impl Hue {
+	pub async fn new(ip: Ipv4Addr, device_type: DeviceType) -> Result<Hue, HueError> {
 		let bridge = match Self::get_config(&ip).await {
 			Some(config) => Bridge::from((ip, config)),
 			None => return Err(HueError::Connection),
 		};
 
-		Ok(Client {
+		Ok(Hue {
 			bridge,
 			device_type,
 			application_key: None,
 		})
 	}
 
-	pub async fn new_with_key(
-		ip: Ipv4Addr,
-		device_type: DeviceType,
-		application_key: String,
-	) -> Result<Client, HueError> {
+	pub async fn new_with_key(ip: Ipv4Addr, device_type: DeviceType, application_key: String) -> Result<Hue, HueError> {
 		let bridge = match Self::get_config(&ip).await {
 			Some(config) => Bridge::from((ip, config)),
 			None => return Err(HueError::Connection),
 		};
 
-		Ok(Client {
+		Ok(Hue {
 			bridge,
 			device_type,
 			application_key: Some(application_key),
