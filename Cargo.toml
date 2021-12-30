@@ -2,6 +2,10 @@
 name = "rues"
 version = "0.1.0"
 edition = "2021"
+description = "Rust wrapper for Hue v2 API."
+homepage = "https://github.com/vgobbo/rues#rues"
+repository = "https://github.com/vgobbo/rues"
+readme = "README.md"
 
 [dependencies]
 mdns-sd = { version = "0.2" }
