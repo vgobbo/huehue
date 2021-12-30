@@ -36,6 +36,23 @@ pub fn build_with_key(application_key: String) -> Client {
 	build_base().default_headers(headers).build().unwrap()
 }
 
+pub async fn get_auth<R>(application_key: String, url: Url) -> Result<R, HueError>
+where
+	R: DeserializeOwned,
+{
+	let client = build_with_key(application_key);
+
+	let response = match client.get(url).send().await {
+		Ok(response) => response,
+		Err(e) => return Err(HueError::from(e)),
+	};
+
+	match response.json::<R>().await {
+		Ok(payload) => Ok(payload),
+		Err(e) => Err(HueError::from(e)),
+	}
+}
+
 pub async fn put_auth<R, T>(application_key: String, url: Url, object: &T) -> Result<R, HueError>
 where
 	T: Serialize,
