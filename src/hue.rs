@@ -129,24 +129,16 @@ impl Hue {
 	pub async fn lights(&self) -> Result<Lights, HueError> {
 		self.check_authorization()?;
 
-		let response = match http::build_with_key(self.application_key.clone().unwrap())
-			.get(self.url("clip/v2/resource/light"))
-			.send()
-			.await
-		{
-			Ok(response) => response,
-			Err(e) => return Err(HueError::from(e)),
-		};
+		let response: GetLightsResponse = http::get_auth(
+			self.application_key.clone().unwrap(),
+			self.url("clip/v2/resource/light"),
+		)
+		.await?;
 
-		let payload = match response.json::<GetLightsResponse>().await {
-			Ok(payload) => payload,
-			Err(e) => return Err(HueError::from(e)),
-		};
-
-		if let Some(data) = payload.data {
+		if let Some(data) = response.data {
 			return Ok(data.into_iter().map(|datum| Light::new(self, datum)).collect());
 		}
-		if let Some(error) = payload.error {
+		if let Some(error) = response.error {
 			return Err(HueError::from(error.r#type.clone()));
 		}
 
