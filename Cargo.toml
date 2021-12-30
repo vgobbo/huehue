@@ -8,6 +8,7 @@ repository = "https://github.com/vgobbo/rues"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 keywords = [ "hue" ]
+authors = [ "Vinicius Gobbo Antunes de Oliveira <vgobbo@gmail.com>" ]
 
 [dependencies]
 mdns-sd = { version = "0.2" }
