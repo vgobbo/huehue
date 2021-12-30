@@ -15,6 +15,7 @@ pub enum HueError {
 	AlreadyAuthorized,
 	Connection,
 	Response(reqwest::Error),
+	Unsupported,
 	Unexpected,
 	Unknown,
 }
