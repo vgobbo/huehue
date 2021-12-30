@@ -1,13 +1,32 @@
 use std::net::Ipv4Addr;
 use std::str::FromStr;
 
+use rues::color::Component;
 use rues::models::device_type::DeviceType;
 use rues::{Hue, Light};
 use serde::Serialize;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt, Serialize)]
+struct ColorArguments {
+	#[structopt(long)]
+	pub x: f32,
+
+	#[structopt(long)]
+	pub y: f32,
+}
+
+#[derive(Debug, StructOpt, Serialize)]
+enum ActionArguments {
+	Switch,
+	Color(ColorArguments),
+}
+
+#[derive(Debug, StructOpt, Serialize)]
 struct Arguments {
+	#[structopt(subcommand)]
+	pub action: ActionArguments,
+
 	#[structopt(long, env = "RUES_BRIDGE")]
 	pub bridge: Ipv4Addr,
 
@@ -19,9 +38,6 @@ struct Arguments {
 
 	#[structopt(long)]
 	pub id: uuid::Uuid,
-
-	#[structopt(long)]
-	pub on: bool,
 }
 
 fn print_light(light: &Light) {
@@ -68,11 +84,29 @@ async fn main() {
 		},
 	};
 
-	match light.switch(arguments.on).await {
-		Ok(_) => print_light(&light),
-		Err(e) => {
-			println!("Unexpected Hue error {:?}.", e);
-			return;
+	match arguments.action {
+		ActionArguments::Switch => {
+			match light.switch(!light.on).await {
+				Ok(_) => (),
+				Err(e) => {
+					println!("Unexpected Hue error {:?}.", e);
+					return;
+				},
+			}
+		},
+		ActionArguments::Color(color) => {
+			match light
+				.set_color(Component::new(color.x, color.y).expect("Invalid color."))
+				.await
+			{
+				Ok(_) => (),
+				Err(e) => {
+					println!("Unexpected Hue error {:?}.", e);
+					return;
+				},
+			}
 		},
 	}
+
+	print_light(&light);
 }

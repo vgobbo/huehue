@@ -1,6 +1,6 @@
-use crate::color::{Color, Temperature};
+use crate::color::{Color, Component, Temperature};
 use crate::http::HueError;
-use crate::models::lights::{GetLightsResponseItem, LightOnRequest};
+use crate::models::lights::{GetLightsResponseItem, LightOnRequest, LightSetColorRequest};
 use crate::models::GenericResponse;
 use crate::{http, Hue};
 
@@ -38,6 +38,26 @@ impl Light {
 		match http::put_auth::<GenericResponse, LightOnRequest>(application_key, url, &request_payload).await {
 			Ok(_) => {
 				self.on = on;
+				Ok(())
+			},
+			Err(e) => Err(e),
+		}
+	}
+
+	pub async fn set_color(&mut self, component: Component) -> Result<(), HueError> {
+		if self.color.is_none() {
+			return Err(HueError::Unsupported);
+		}
+
+		let url = self.hue.url(format!("clip/v2/resource/light/{}", self.id).as_str());
+		let application_key = self.hue.application_key().clone().unwrap();
+		let request_payload = LightSetColorRequest::new(component.clone());
+
+		match http::put_auth::<GenericResponse, LightSetColorRequest>(application_key, url, &request_payload).await {
+			Ok(_) => {
+				if let Some(color) = &mut self.color {
+					color.xy = component;
+				}
 				Ok(())
 			},
 			Err(e) => Err(e),

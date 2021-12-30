@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::color::{Color, Temperature};
+use crate::color::{Color, Component, Temperature};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Metadata {
@@ -44,8 +44,26 @@ pub struct LightOnRequest {
 	pub on: On,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LightSetColorRequestXY {
+	pub xy: Component,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LightSetColorRequest {
+	pub color: LightSetColorRequestXY,
+}
+
 impl LightOnRequest {
 	pub fn new(on: bool) -> LightOnRequest {
 		LightOnRequest { on: On { on } }
+	}
+}
+
+impl LightSetColorRequest {
+	pub fn new(color: Component) -> LightSetColorRequest {
+		LightSetColorRequest {
+			color: LightSetColorRequestXY { xy: color },
+		}
 	}
 }
