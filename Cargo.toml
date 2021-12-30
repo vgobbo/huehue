@@ -6,6 +6,7 @@ description = "Rust wrapper for Hue v2 API."
 homepage = "https://github.com/vgobbo/rues#rues"
 repository = "https://github.com/vgobbo/rues"
 readme = "README.md"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 mdns-sd = { version = "0.2" }
