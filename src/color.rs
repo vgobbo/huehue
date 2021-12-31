@@ -84,9 +84,9 @@ impl Gamut {
 		return (d == 0f32) || (d < 0f32 && s + t <= 0f32) || (d >= 0f32 && s + t > 0f32);
 	}
 
-	pub fn restrain(&self, xy: Component) -> Component {
+	pub fn restrain(&self, xy: &Component) -> Component {
 		if self.contains(&xy) {
-			xy
+			xy.clone()
 		} else {
 			let rg = Self::restrain_point_in_segment(&xy, &self.red, &self.green);
 			let gb = Self::restrain_point_in_segment(&xy, &self.green, &self.blue);
@@ -117,15 +117,16 @@ impl Gamut {
 		let g = Self::gamma_correct(rgb.g as f32 / 255f32);
 		let b = Self::gamma_correct(rgb.b as f32 / 255f32);
 
-		let x_ = 0.649926 * r + 0.103455 * g + 0.197109 * b;
-		let y_ = 0.234327 * r + 0.743075 * g + 0.022598 * b;
-		let z_ = 0.000000 * r + 0.053077 * g + 1.035763 * b;
+		let x_ = 0.4124564 * r + 0.3575761 * g + 0.1804375 * b;
+		let y_ = 0.2126729 * r + 0.7151522 * g + 0.0721750 * b;
+		let z_ = 0.0193339 * r + 0.1191920 * g + 0.9503041 * b;
 
 		let x = x_ / (x_ + y_ + z_);
 		let y = y_ / (x_ + y_ + z_);
 		// we could calculate z the same way, but we don't need it.
+		// we could also use y at its current value as brightness.
 
-		self.restrain(Component::unchecked(x, y))
+		self.restrain(&Component::unchecked(x, y))
 	}
 
 	fn gamma_correct(c: f32) -> f32 {
