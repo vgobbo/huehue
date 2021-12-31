@@ -2,9 +2,9 @@ use std::fs::OpenOptions;
 use std::io::{BufWriter, Write};
 use std::net::Ipv4Addr;
 
-use rues::models::device_type::DeviceType;
-use rues::Hue;
-use rues::HueError;
+use huehue::models::device_type::DeviceType;
+use huehue::Hue;
+use huehue::HueError;
 use serde::Serialize;
 use structopt::StructOpt;
 
@@ -21,7 +21,7 @@ struct Arguments {
 async fn main() {
 	let arguments = Arguments::from_args();
 
-	let device_type = DeviceType::new("rues".to_owned(), arguments.device).expect("Invalid device name.");
+	let device_type = DeviceType::new("huehue".to_owned(), arguments.device).expect("Invalid device name.");
 
 	println!("Attempting to authorize with {}.", arguments.address);
 
@@ -48,7 +48,7 @@ async fn main() {
 			.create(true)
 			.write(true)
 			.truncate(true)
-			.open("rues.env")
+			.open("huehue.env")
 		{
 			Ok(file) => {
 				let mut writer = BufWriter::new(file);

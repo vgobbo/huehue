@@ -1,8 +1,8 @@
 use std::net::Ipv4Addr;
 use std::str::FromStr;
 
-use rues::models::device_type::DeviceType;
-use rues::{Hue, Light};
+use huehue::models::device_type::DeviceType;
+use huehue::{Hue, Light};
 use serde::Serialize;
 use structopt::StructOpt;
 

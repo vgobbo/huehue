@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use rues::Hue;
+use huehue::Hue;
 
 #[tokio::main]
 async fn main() {

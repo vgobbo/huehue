@@ -1,4 +1,4 @@
-# Rues
+# Huehue
 
 A Rust wrapper for [Hue API v2](https://developers.meethue.com/develop/hue-api-v2/).
 
