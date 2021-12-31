@@ -26,6 +26,15 @@ fn print_lights(light: &Light) {
 
 	if let Some(color) = &light.color {
 		println!("\tColor: ({}, {})", color.xy.x, color.xy.y);
+		println!(
+			"\tGamut: R={},{} G={},{} B={},{}",
+			color.gamut.red.x,
+			color.gamut.red.y,
+			color.gamut.green.x,
+			color.gamut.green.y,
+			color.gamut.blue.x,
+			color.gamut.blue.y
+		);
 	}
 
 	if let Some(value) = &light.temperature.mirek {
