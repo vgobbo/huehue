@@ -33,6 +33,19 @@ pub struct Temperature {
 	pub mirek_valid: bool,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RGB8 {
+	pub r: u8,
+	pub g: u8,
+	pub b: u8,
+}
+
+impl RGB8 {
+	pub fn new(r: u8, g: u8, b: u8) -> RGB8 {
+		RGB8 { r, g, b }
+	}
+}
+
 impl Component {
 	pub fn new(x: f32, y: f32) -> Option<Component> {
 		if x >= 0f32 && y >= 0f32 {
@@ -99,14 +112,14 @@ impl Gamut {
 		Component::unchecked(a.x + t * (b.x - a.x), a.y + t * (b.y - a.y))
 	}
 
-	pub fn xy_from_rgb(&self, r: u8, g: u8, b: u8) -> Component {
-		let r_ = Self::gamma_correct(r as f32 / 255f32);
-		let g_ = Self::gamma_correct(g as f32 / 255f32);
-		let b_ = Self::gamma_correct(b as f32 / 255f32);
+	pub fn xy_from_rgb(&self, rgb: RGB8) -> Component {
+		let r = Self::gamma_correct(rgb.r as f32 / 255f32);
+		let g = Self::gamma_correct(rgb.g as f32 / 255f32);
+		let b = Self::gamma_correct(rgb.b as f32 / 255f32);
 
-		let x_ = 0.649926 * r_ + 0.103455 * g_ + 0.197109 * b_;
-		let y_ = 0.234327 * r_ + 0.743075 * g_ + 0.022598 * b_;
-		let z_ = 0.000000 * r_ + 0.053077 * g_ + 1.035763 * b_;
+		let x_ = 0.649926 * r + 0.103455 * g + 0.197109 * b;
+		let y_ = 0.234327 * r + 0.743075 * g + 0.022598 * b;
+		let z_ = 0.000000 * r + 0.053077 * g + 1.035763 * b;
 
 		let x = x_ / (x_ + y_ + z_);
 		let y = y_ / (x_ + y_ + z_);
@@ -167,17 +180,17 @@ mod tests {
 
 		assert_component_eq(
 			Component::unchecked(0.6915f32, 0.3083f32),
-			gamut.xy_from_rgb(255, 0, 0),
+			gamut.xy_from_rgb(RGB8::new(255, 0, 0)),
 			0.0001,
 		);
 		assert_component_eq(
 			Component::unchecked(0.17f32, 0.7f32),
-			gamut.xy_from_rgb(0, 255, 0),
+			gamut.xy_from_rgb(RGB8::new(0, 255, 0)),
 			0.0001,
 		);
 		assert_component_eq(
 			Component::unchecked(0.1532f32, 0.0475f32),
-			gamut.xy_from_rgb(0, 0, 255),
+			gamut.xy_from_rgb(RGB8::new(0, 0, 255)),
 			0.0001,
 		);
 	}
@@ -192,7 +205,7 @@ mod tests {
 
 		assert_component_eq(
 			Component::unchecked(0.3127301, 0.32901987),
-			gamut.xy_from_rgb(128, 128, 128),
+			gamut.xy_from_rgb(RGB8::new(128, 128, 128)),
 			0.0001,
 		);
 	}
