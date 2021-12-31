@@ -42,6 +42,22 @@ impl Component {
 		}
 	}
 
+	pub fn from_rgb(r: u8, g: u8, b: u8) -> Component {
+		let r_ = r as f32 / 255f32;
+		let g_ = g as f32 / 255f32;
+		let b_ = b as f32 / 255f32;
+
+		let x_ = 0.4124564 * r_ + 0.3575761 * g_ + 0.1804375 * b_;
+		let y_ = 0.2126729 * r_ + 0.7151522 * g_ + 0.0721750 * b_;
+		let z_ = 0.0193339 * r_ + 0.1191920 * g_ + 0.9503041 * b_;
+
+		let x = x_ / (x_ + y_ + z_);
+		let y = y_ / (x_ + y_ + z_);
+		// we could calculate z the same way, but we don't need it.
+
+		Component::unchecked(x, y)
+	}
+
 	pub fn unchecked(x: f32, y: f32) -> Component {
 		Self::new(x, y).expect(format!("Values ({}, {}) invalid.", x, y).as_str())
 	}
