@@ -21,5 +21,6 @@ url = { version = "2.2" }
 uuid = { version = "0.8", features = [ "serde" ] }
 
 [dev-dependencies]
+assert_approx_eq = { version = "1.1" }
 structopt = { version = "0.3" }
 tokio = { version = "1.15", features = [ "rt-multi-thread", "macros" ] }
