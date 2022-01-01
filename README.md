@@ -6,11 +6,13 @@ Note that the Hue API v2 is in early access at the time of writing, so an upgrad
 unpredictable way.
 
 ## Features
+- Hue Bridge certificate validation.
 - Discovery through mDNS.
 - Discovery through [discovery.meethue.com](https://discovery.meethue.com).
 - Light:
     - Switch on/off.
     - Color in the [CIE 1931 color space](https://en.wikipedia.org/wiki/CIE_1931_color_space).
+- XY to RGB and RGB to XY conversion. 
 
 ## Examples
 
