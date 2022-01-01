@@ -7,13 +7,15 @@ unpredictable way.
 
 ## Features
 - Hue Bridge certificate validation.
-- Discovery through mDNS.
-- Discovery through [discovery.meethue.com](https://discovery.meethue.com).
+- Bridge discovery:
+  - through mDNS.
+  - through [discovery.meethue.com](https://discovery.meethue.com).
+  - user specified IPv4 address.
 - Light:
-  - Switch on/off.
-  - Color in the [CIE 1931 color space](https://en.wikipedia.org/wiki/CIE_1931_color_space).
-  - Color in the sRGB color space.
-  - Dimming.
+  - switch on/off.
+  - color in the [CIE 1931 color space](https://en.wikipedia.org/wiki/CIE_1931_color_space).
+  - color in the sRGB color space.
+  - dimming.
 - XY to RGB and RGB to XY conversion.
 
 ## Examples
