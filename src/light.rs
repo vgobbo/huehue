@@ -1,6 +1,6 @@
 use crate::color::{Color, Component, Temperature, RGB8};
 use crate::http::HueError;
-use crate::models::lights::{GetLightsResponseItem, LightOnRequest, LightSetColorRequest};
+use crate::models::lights::{GetLightsResponseItem, LightOnRequest, LightSetBrightnessRequest, LightSetColorRequest};
 use crate::models::GenericResponse;
 use crate::{http, Hue};
 
@@ -70,6 +70,21 @@ impl Light {
 			self.set_color(xy).await
 		} else {
 			Err(HueError::Unsupported)
+		}
+	}
+
+	pub async fn dimm(&mut self, value: f32) -> Result<(), HueError> {
+		let url = self.hue.url(format!("clip/v2/resource/light/{}", self.id).as_str());
+		let application_key = self.hue.application_key().clone().unwrap();
+		let request_payload = LightSetBrightnessRequest::new(value);
+
+		match http::put_auth::<GenericResponse, LightSetBrightnessRequest>(application_key, url, &request_payload).await
+		{
+			Ok(_) => {
+				self.brightness = request_payload.dimming.brightness;
+				Ok(())
+			},
+			Err(e) => Err(e),
 		}
 	}
 }

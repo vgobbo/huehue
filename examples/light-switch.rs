@@ -29,8 +29,15 @@ struct RgbArguments {
 }
 
 #[derive(Debug, StructOpt, Serialize)]
+struct DimmArguments {
+	#[structopt(long)]
+	pub value: f32,
+}
+
+#[derive(Debug, StructOpt, Serialize)]
 enum ActionArguments {
 	Switch,
+	Dimm(DimmArguments),
 	Xy(XyArguments),
 	Rgb(RgbArguments),
 }
@@ -130,6 +137,15 @@ async fn main() {
 		},
 		ActionArguments::Rgb(color) => {
 			match light.set_color_rgb(RGB8::new(color.r, color.g, color.b)).await {
+				Ok(_) => (),
+				Err(e) => {
+					println!("Unexpected Hue error {:?}.", e);
+					return;
+				},
+			}
+		},
+		ActionArguments::Dimm(dimm) => {
+			match light.dimm(dimm.value).await {
 				Ok(_) => (),
 				Err(e) => {
 					println!("Unexpected Hue error {:?}.", e);
