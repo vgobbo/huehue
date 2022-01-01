@@ -35,7 +35,8 @@
 //! Simply create a [`Hue`] struct specifying the bridge address and a device, and call [`Hue::authorize`]:
 //!
 //! Before the application is run, you must press the round button in the bridge. Else, you will get an unauthorized
-//! error. ```no_run
+//! error.
+//! ```no_run
 //! # use std::net::Ipv4Addr;
 //! # use std::time::Duration;
 //! # use huehue::{Hue, HueError};
