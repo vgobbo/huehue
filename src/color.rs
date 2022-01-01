@@ -129,11 +129,38 @@ impl Gamut {
 		self.restrain(&Component::unchecked(x, y))
 	}
 
+	pub fn xy_to_rgb8(&self, xy: &Component) -> RGB8 {
+		let gxy = self.restrain(&xy);
+
+		let x = gxy.x;
+		let y = gxy.y;
+		let z = 1.0 - gxy.x - gxy.y;
+
+		// if brightness is supplied:
+		// let x = (brightness / xy.y) * xy.x;
+		// let y = brightness;
+		// let z = (brightness / xy.y) * xy.z;
+
+		let r = Self::gamma_inverse(3.2404542 * x + -1.5371385 * y + -0.4985314 * z);
+		let g = Self::gamma_inverse(-0.9692660 * x + 1.8760108 * y + 0.0415560 * z);
+		let b = Self::gamma_inverse(0.0556434 * x + -0.2040259 * y + 1.0572252 * z);
+
+		RGB8::new((r * 255.0) as u8, (g * 255.0) as u8, (b * 255.0) as u8)
+	}
+
 	fn gamma_correct(c: f32) -> f32 {
 		if c > 0.04045 {
 			((c + 0.055) / (1.0 + 0.055)).powf(2.4)
 		} else {
 			c / 12.92
+		}
+	}
+
+	fn gamma_inverse(c: f32) -> f32 {
+		if c > 0.0031308 {
+			(1.0 + 0.055) * c.powf(1.0 / 2.4) - 0.055
+		} else {
+			c * 12.92
 		}
 	}
 }
@@ -151,6 +178,58 @@ impl Color {
 			false => None,
 		}
 	}
+}
+
+#[macro_export]
+macro_rules! assert_component_eq {
+	($a:expr, $b:expr, $d:expr) => {
+		assert!(
+			!(($a.x - $b.x > $d) || ($b.x - $a.x > $d)),
+			"x component {} and {} outside of range {} ({})",
+			$a.x,
+			$b.x,
+			$d,
+			($a.x - $b.x).abs()
+		);
+		assert!(
+			!(($a.y - $b.y > $d) || ($b.y - $a.y > $d)),
+			"y component {} and {} outside of range {} ({})",
+			$a.y,
+			$b.y,
+			$d,
+			($a.y - $b.y).abs()
+		);
+	};
+}
+
+#[macro_export]
+macro_rules! assert_rgb_eq {
+	($a:expr, $b:expr, $d:expr) => {
+		assert!(
+			!(($a.r as i16 - $b.r as i16).abs() > $d),
+			"r component {} and {} outside of range {} ({})",
+			$a.r,
+			$b.r,
+			$d,
+			($a.r as i16 - $b.r as i16).abs()
+		);
+		assert!(
+			!(($a.g as i16 - $b.g as i16).abs() > $d),
+			"g component {} and {} outside of range {} ({})",
+			$a.g,
+			$b.g,
+			$d,
+			($a.g as i16 - $b.g as i16).abs()
+		);
+		assert!(
+			!(($a.b as i16 - $b.b as i16).abs() > $d),
+			"b component {} and {} outside of range {} ({})",
+			$a.b,
+			$b.b,
+			$d,
+			($a.b as i16 - $b.b as i16).abs()
+		);
+	};
 }
 
 #[cfg(test)]
@@ -179,20 +258,20 @@ mod tests {
 			Component::unchecked(0.1532f32, 0.0475f32),
 		);
 
-		assert_component_eq(
-			Component::unchecked(0.6915f32, 0.3083f32),
+		assert_component_eq!(
+			Component::unchecked(0.6399f32, 0.3300f32),
 			gamut.xy_from_rgb8(RGB8::new(255, 0, 0)),
-			0.0001,
+			0.0001
 		);
-		assert_component_eq(
-			Component::unchecked(0.17f32, 0.7f32),
+		assert_component_eq!(
+			Component::unchecked(0.3f32, 0.6f32),
 			gamut.xy_from_rgb8(RGB8::new(0, 255, 0)),
-			0.0001,
+			0.0001
 		);
-		assert_component_eq(
-			Component::unchecked(0.1532f32, 0.0475f32),
+		assert_component_eq!(
+			Component::unchecked(0.1535f32, 0.0599f32),
 			gamut.xy_from_rgb8(RGB8::new(0, 0, 255)),
-			0.0001,
+			0.0001
 		);
 	}
 
@@ -204,19 +283,51 @@ mod tests {
 			Component::unchecked(0.1532f32, 0.0475f32),
 		);
 
-		assert_component_eq(
+		assert_component_eq!(
 			Component::unchecked(0.3127301, 0.32901987),
 			gamut.xy_from_rgb8(RGB8::new(128, 128, 128)),
-			0.0001,
+			0.0001
 		);
 	}
 
-	fn assert_component_eq(a: Component, b: Component, d: f32) {
-		if (a.x - b.x > d) || (b.x - a.x > d) {
-			panic!("x components {} and {} outside of range {}", a.x, b.x, d);
-		}
-		if (a.y - b.y > d) || (b.y - a.y > d) {
-			panic!("y components {} and {} outside of range {}", a.y, b.y, d);
-		}
+	#[test]
+	fn gamut_xy_to_rgb_on_edge() {
+		let gamut = Gamut::new(
+			Component::unchecked(0.6915f32, 0.3083f32),
+			Component::unchecked(0.17f32, 0.7f32),
+			Component::unchecked(0.1532f32, 0.0475f32),
+		);
+
+		assert_rgb_eq!(
+			RGB8::new(255, 0, 0),
+			gamut.xy_to_rgb8(&Component::unchecked(0.6399f32, 0.3300f32)),
+			1
+		);
+		assert_rgb_eq!(
+			RGB8::new(0, 236, 0),
+			gamut.xy_to_rgb8(&Component::unchecked(0.3f32, 0.6f32)),
+			1
+		);
+		assert_rgb_eq!(
+			RGB8::new(30, 0, 234),
+			gamut.xy_to_rgb8(&Component::unchecked(0.1535f32, 0.0599f32)),
+			1
+		);
+	}
+
+	#[test]
+	fn gamut_xy_to_rgb_inside() {
+		let gamut = Gamut::new(
+			Component::unchecked(0.6915f32, 0.3083f32),
+			Component::unchecked(0.17f32, 0.7f32),
+			Component::unchecked(0.1532f32, 0.0475f32),
+		);
+
+		// we don't have brightness component, so it is not RGB(128, 128, 128) as in gamut_xy_from_rgb_inside.
+		assert_rgb_eq!(
+			RGB8::new(155, 155, 155),
+			gamut.xy_to_rgb8(&Component::unchecked(0.3127301, 0.32901987)),
+			1
+		);
 	}
 }
