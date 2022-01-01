@@ -10,8 +10,10 @@ unpredictable way.
 - Discovery through mDNS.
 - Discovery through [discovery.meethue.com](https://discovery.meethue.com).
 - Light:
-    - Switch on/off.
-    - Color in the [CIE 1931 color space](https://en.wikipedia.org/wiki/CIE_1931_color_space).
+  - Switch on/off.
+  - Color in the [CIE 1931 color space](https://en.wikipedia.org/wiki/CIE_1931_color_space).
+  - Color in the sRGB color space.
+  - Dimming.
 - XY to RGB and RGB to XY conversion.
 
 ## Examples

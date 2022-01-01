@@ -12,6 +12,8 @@ unpredictable way.
 - Light:
     - Switch on/off.
     - Color in the [CIE 1931 color space](https://en.wikipedia.org/wiki/CIE_1931_color_space).
+    - Color in the sRGB color space.
+    - Dimming.
 - XY to RGB and RGB to XY conversion. 
 
 ## Examples
