@@ -1,4 +1,4 @@
-use crate::color::{Color, Component, Temperature};
+use crate::color::{Color, Component, Temperature, RGB8};
 use crate::http::HueError;
 use crate::models::lights::{GetLightsResponseItem, LightOnRequest, LightSetColorRequest};
 use crate::models::GenericResponse;
@@ -61,6 +61,15 @@ impl Light {
 				Ok(())
 			},
 			Err(e) => Err(e),
+		}
+	}
+
+	pub async fn set_color_rgb(&mut self, rgb: RGB8) -> Result<(), HueError> {
+		if let Some(color) = &self.color {
+			let xy = color.gamut.xy_from_rgb8(rgb);
+			self.set_color(xy).await
+		} else {
+			Err(HueError::Unsupported)
 		}
 	}
 }

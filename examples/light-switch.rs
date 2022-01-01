@@ -1,14 +1,14 @@
 use std::net::Ipv4Addr;
 use std::str::FromStr;
 
-use huehue::color::Component;
+use huehue::color::{Component, RGB8};
 use huehue::models::device_type::DeviceType;
 use huehue::{Hue, Light};
 use serde::Serialize;
 use structopt::StructOpt;
 
 #[derive(Debug, StructOpt, Serialize)]
-struct ColorArguments {
+struct XyArguments {
 	#[structopt(long)]
 	pub x: f32,
 
@@ -17,9 +17,22 @@ struct ColorArguments {
 }
 
 #[derive(Debug, StructOpt, Serialize)]
+struct RgbArguments {
+	#[structopt(long)]
+	pub r: u8,
+
+	#[structopt(long)]
+	pub g: u8,
+
+	#[structopt(long)]
+	pub b: u8,
+}
+
+#[derive(Debug, StructOpt, Serialize)]
 enum ActionArguments {
 	Switch,
-	Color(ColorArguments),
+	Xy(XyArguments),
+	Rgb(RgbArguments),
 }
 
 #[derive(Debug, StructOpt, Serialize)]
@@ -103,11 +116,20 @@ async fn main() {
 				},
 			}
 		},
-		ActionArguments::Color(color) => {
+		ActionArguments::Xy(color) => {
 			match light
 				.set_color(Component::new(color.x, color.y).expect("Invalid color."))
 				.await
 			{
+				Ok(_) => (),
+				Err(e) => {
+					println!("Unexpected Hue error {:?}.", e);
+					return;
+				},
+			}
+		},
+		ActionArguments::Rgb(color) => {
+			match light.set_color_rgb(RGB8::new(color.r, color.g, color.b)).await {
 				Ok(_) => (),
 				Err(e) => {
 					println!("Unexpected Hue error {:?}.", e);
