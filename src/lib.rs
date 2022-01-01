@@ -27,7 +27,7 @@
 //! # }
 //! ```
 //!
-//! Both MDNS and [discovery.meehue.com] will be used during the discovery.
+//! Both MDNS and [discovery.meehue.com](discovery.meehue.com) will be used during the discovery.
 //!
 //! ## Authorization
 //! Once a bridge is chosen, you made need to generate an application key with it, so you can interact with it.
@@ -49,11 +49,11 @@
 //! 	.expect("Failed to run bridge information.");
 //! hue.authorize().await.expect("Failed to link with the bridge.");
 //! hue.application_key()
-//! 	.expect("When successfully authenticated, this must always be valid.")
+//! 	.expect("When successfully authorized, this must always be valid.")
 //! # }
 //! ```
 //!
-//! The [`Hue::application_key()`] field should be saved so authentication is no longer required.
+//! The [`Hue::application_key()`] field should be saved so authorization is no longer required.
 //! ```no_run
 //! # use std::net::Ipv4Addr;
 //! # use std::time::Duration;
