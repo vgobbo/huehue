@@ -20,7 +20,7 @@ unpredictable way.
 
 ## Examples
 
-The `examples` folder has fully functional sample applications to demonstrate some implemented features. The examples
+The [examples](https://github.com/vgobbo/huehue/tree/main/examples) folder has fully functional sample applications to demonstrate some implemented features. The examples
 aim to be trivial to understand by focusing on specific functionality, and should be easy to copy and build your own
 application.
 
