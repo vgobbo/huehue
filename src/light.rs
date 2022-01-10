@@ -14,7 +14,7 @@ pub struct Light {
 	pub on: bool,
 	pub brightness: Option<f32>,
 	pub color: Option<Color>,
-	pub temperature: Temperature,
+	pub temperature: Option<Temperature>,
 }
 
 impl Light {

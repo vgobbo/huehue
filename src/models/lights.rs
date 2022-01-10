@@ -36,7 +36,7 @@ pub struct GetLightsResponseItem {
 	pub on: On,
 
 	pub color: Option<Color>,
-	pub color_temperature: Temperature,
+	pub color_temperature: Option<Temperature>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

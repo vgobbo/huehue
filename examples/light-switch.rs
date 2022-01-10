@@ -82,12 +82,14 @@ fn print_light(light: &Light) {
 		);
 	}
 
-	if let Some(value) = &light.temperature.mirek {
-		let mirek_schema = &light.temperature.mirek_schema;
-		println!(
-			"\tTemperature: {} (min: {}, max {})",
-			value, mirek_schema.mirek_minimum, mirek_schema.mirek_maximum
-		);
+	if let Some(temperature) = &light.temperature {
+		if let Some(value) = &temperature.mirek {
+			let mirek_schema = &temperature.mirek_schema;
+			println!(
+				"\tTemperature: {} (min: {}, max {})",
+				value, mirek_schema.mirek_minimum, mirek_schema.mirek_maximum
+			);
+		}
 	}
 }
 
