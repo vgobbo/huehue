@@ -16,6 +16,9 @@ unpredictable way.
   - color in the [CIE 1931 color space](https://en.wikipedia.org/wiki/CIE_1931_color_space).
   - color in the sRGB color space.
   - dimming.
+- Smart plug:
+  - switch on/off.
+  - **note**: smart plug is exposed as a light, since it is also listed as a light by Hue.
 - XY to RGB and RGB to XY conversion.
 
 ## Examples
