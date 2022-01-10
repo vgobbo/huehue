@@ -32,7 +32,7 @@ pub struct GetLightsResponseItem {
 
 	pub id: uuid::Uuid,
 	pub metadata: Metadata,
-	pub dimming: Dimming,
+	pub dimming: Option<Dimming>,
 	pub on: On,
 
 	pub color: Option<Color>,

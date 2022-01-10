@@ -22,7 +22,10 @@ fn print_lights(light: &Light) {
 	println!("> Light {}:", light.name);
 	println!("\tIdentifier: {}", light.id);
 	println!("\tOn: {}", light.on);
-	println!("\tBrightness: {}", light.brightness);
+
+	if let Some(brightness) = &light.brightness {
+		println!("\tBrightness: {}", brightness);
+	}
 
 	if let Some(color) = &light.color {
 		println!("\tColor: ({}, {})", color.xy.x, color.xy.y);
