@@ -11,6 +11,8 @@ unpredictable way.
   - through mDNS.
   - through [discovery.meethue.com](https://discovery.meethue.com).
   - user specified IPv4 address.
+- Devices:
+  - list devices.
 - Light:
   - switch on/off.
   - color in the [CIE 1931 color space](https://en.wikipedia.org/wiki/CIE_1931_color_space).
