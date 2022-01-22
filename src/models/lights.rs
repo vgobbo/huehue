@@ -3,12 +3,6 @@ use serde::{Deserialize, Serialize};
 use crate::color::{Color, Component, Temperature};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Metadata {
-	pub archetype: String,
-	pub name: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct On {
 	pub on: bool,
 }
@@ -31,7 +25,7 @@ pub struct GetLightsResponseItem {
 	pub r#type: String,
 
 	pub id: uuid::Uuid,
-	pub metadata: Metadata,
+	pub metadata: super::generic::Metadata,
 	pub dimming: Option<Dimming>,
 	pub on: On,
 

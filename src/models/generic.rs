@@ -16,3 +16,9 @@ pub struct GenericResponse {
 	pub errors: Option<Vec<GenericError>>,
 	pub data: Option<Vec<GenericIdentifier>>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Metadata {
+	pub archetype: String,
+	pub name: String,
+}
