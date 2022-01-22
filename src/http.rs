@@ -54,6 +54,21 @@ where
 	}
 }
 
+#[allow(unused)]
+pub async fn get_text(application_key: String, url: Url) -> Result<String, HueError> {
+	let client = build_with_key(application_key);
+
+	let response = match client.get(url).send().await {
+		Ok(response) => response,
+		Err(e) => return Err(HueError::from(e)),
+	};
+
+	match response.text().await {
+		Ok(payload) => Ok(payload),
+		Err(e) => Err(HueError::from(e)),
+	}
+}
+
 pub async fn put_auth<R, T>(application_key: String, url: Url, object: &T) -> Result<R, HueError>
 where
 	T: Serialize,
