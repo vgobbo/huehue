@@ -55,7 +55,7 @@ where
 }
 
 #[allow(unused)]
-pub async fn get_text(application_key: String, url: Url) -> Result<String, HueError> {
+pub async fn get_auth_text(application_key: String, url: Url) -> Result<String, HueError> {
 	let client = build_with_key(application_key);
 
 	let response = match client.get(url).send().await {
