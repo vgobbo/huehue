@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct GenericIdentifier {
 	pub rid: uuid::Uuid,
 	pub rtype: String,
@@ -25,11 +25,10 @@ pub struct Metadata {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProductData {
-	pub product_id: String,
-	pub manufacturer_name: String,
-	pub product_name: String,
-	pub product_archetype: String,
 	pub certified: bool,
 	pub model_id: String,
+	pub manufacturer_name: String,
+	pub product_archetype: String,
+	pub product_name: String,
 	pub software_version: String,
 }

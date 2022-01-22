@@ -3,10 +3,12 @@ use std::time::Duration;
 
 use url::Url;
 
+use crate::device::{Device, Devices};
 use crate::http::HueError;
 use crate::light::Lights;
 use crate::models::create_user::{CreateUserRequest, CreateUserResponse};
 use crate::models::device_type::DeviceType;
+use crate::models::devices::GetDevicesResponse;
 use crate::models::lights::GetLightsResponse;
 use crate::{discover, http, models, Bridge, Light};
 
@@ -137,6 +139,25 @@ impl Hue {
 
 		if let Some(data) = response.data {
 			return Ok(data.into_iter().map(|datum| Light::new(self, datum)).collect());
+		}
+		if let Some(error) = response.error {
+			return Err(HueError::from(error.r#type.clone()));
+		}
+
+		Err(HueError::Unknown)
+	}
+
+	pub async fn devices(&self) -> Result<Devices, HueError> {
+		self.check_authorization()?;
+
+		let response: GetDevicesResponse = http::get_auth(
+			self.application_key.clone().unwrap(),
+			self.url("clip/v2/resource/device"),
+		)
+		.await?;
+
+		if let Some(data) = response.data {
+			return Ok(data.into_iter().map(|datum| Device::new(self, datum)).collect());
 		}
 		if let Some(error) = response.error {
 			return Err(HueError::from(error.r#type.clone()));

@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -8,7 +10,7 @@ pub struct GetDevicesResponseItem {
 	pub id: Uuid,
 	pub metadata: Metadata,
 	pub product_data: ProductData,
-	pub services: Vec<GenericIdentifier>,
+	pub services: HashSet<GenericIdentifier>,
 
 	#[serde(rename = "type")]
 	pub device_type: String,

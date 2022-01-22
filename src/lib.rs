@@ -72,6 +72,7 @@
 pub mod bridge;
 mod certificate;
 pub mod color;
+pub mod device;
 mod discover;
 mod http;
 pub mod hue;
