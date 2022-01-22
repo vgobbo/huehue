@@ -22,3 +22,14 @@ pub struct Metadata {
 	pub archetype: String,
 	pub name: String,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProductData {
+	pub product_id: String,
+	pub manufacturer_name: String,
+	pub product_name: String,
+	pub product_archetype: String,
+	pub certified: bool,
+	pub model_id: String,
+	pub software_version: String,
+}
