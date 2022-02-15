@@ -1,6 +1,6 @@
 [package]
 name = "huehue"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 description = "Rust wrapper for Hue v2 API."
 homepage = "https://github.com/vgobbo/huehue#huehue"
