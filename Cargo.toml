@@ -17,10 +17,11 @@ reqwest = { version = "0.11", features = [ "json", "native-tls" ] }
 serde = { version = "1.0", features = [ "derive" ] }
 serde_json = { version = "1.0" }
 serde_repr = { version = "0.1" }
+tokio = { version = "1.16" }
 url = { version = "2.2" }
 uuid = { version = "0.8", features = [ "serde" ] }
 
 [dev-dependencies]
 assert_approx_eq = { version = "1.1" }
 structopt = { version = "0.3" }
-tokio = { version = "1.15", features = [ "rt-multi-thread", "macros" ] }
+tokio = { version = "1.16", features = [ "rt-multi-thread", "macros" ] }
