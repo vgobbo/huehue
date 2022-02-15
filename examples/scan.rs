@@ -6,7 +6,7 @@ use huehue::Hue;
 async fn main() {
 	println!("Scanning for bridges for 5 seconds.");
 	let bridges = Hue::bridges(Duration::from_secs(5)).await;
-	println!("{} bridges found.\n", bridges.len());
+	println!("{} bridge(s) found.\n", bridges.len());
 
 	let mut i = 1;
 	for bridge in &bridges {
